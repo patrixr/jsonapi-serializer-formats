@@ -31,6 +31,8 @@ class Movie
     faked.actors = [Actor.fake]
     faked.actor_ids = faked.actors.map(&:uid)
     faked.polymorphics = []
+    faked.owner = User.fake
+    faked.owner_id = faked.owner.uid
     faked
   end
 

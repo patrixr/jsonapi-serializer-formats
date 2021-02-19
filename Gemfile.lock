@@ -1,18 +1,13 @@
 PATH
   remote: .
   specs:
-    jsonapi-serializer-formats (0.0.1)
+    jsonapi-serializer-formats (0.0.3)
       activesupport (>= 4.2)
       jsonapi-serializer (>= 2.1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (6.1.3)
-      activesupport (= 6.1.3)
-    activerecord (6.1.3)
-      activemodel (= 6.1.3)
-      activesupport (= 6.1.3)
     activesupport (6.1.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
@@ -42,7 +37,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.2)
-    sqlite3 (1.4.2)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     zeitwerk (2.4.2)
@@ -51,14 +45,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord
   bundler
   byebug
   ffaker
   jsonapi-serializer-formats!
   rake
   rspec
-  sqlite3
 
 BUNDLED WITH
    2.2.3

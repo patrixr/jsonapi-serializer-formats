@@ -1,54 +1,76 @@
 module JSONAPI
   module Formats
-    def hello
-      "hi"
-    end
+    extend ActiveSupport::Concern
 
-    module_function :hello
+    included do
+      class << self 
 
-    def self.included(base)
-      base.class_eval do
-        class << self 
-          def scoped_formats
-            @@scoped_formats ||= []
-          end
-    
-          alias_method :jsonapi_attributes, :attributes
-    
-          #
-          # Override the attribute method to support contexts
-          #
-          def attributes(*attributes_list, &block)
+        def scoped_formats
+          @@scoped_formats ||= []
+        end
+  
+        # --- Override the attribute and relationship methods to support contexts
+
+        [
+          :attributes,
+          :belongs_to,
+          :has_many,
+          :has_one
+        ].each do |method_name|
+
+          original_method_name = "jsonapi_#{method_name}".to_sym
+
+          alias_method original_method_name, method_name
+
+          define_method(method_name) do |*attributes_list, &block|
             formats = [*scoped_formats]
     
             if formats.length.positive?
+              
+              # --- Read options hash (if present)
+
               opts = attributes_list.last
               unless opts.is_a?(Hash)
                 opts = {}
                 attributes_list << opts
               end
-    
+              
+              # --- Inject an :if condition
+
               cond = opts[:if]
               opts[:if] = Proc.new do |_, params = {}|
-                next false if cond.present? && !cond.call(_, params)
+                if cond.present? && !cond.call(_, params)
+                  next false # --- The user's condition failed
+                end
+
                 render_formats = [params[:format]].compact.flatten
-    
+
+                # --- Return true if the user passed the require formats as params
+
                 formats.all? { |f| render_formats.include?(f) }
               end
             end
     
-            jsonapi_attributes(*attributes_list, &block)
+            # --- Call the original method
+
+            send(original_method_name, *attributes_list, &block)
           end
-    
-          def format(fmt)
-            scoped_formats.push(fmt)
-            yield
-          ensure
-            scoped_formats.pop
-          end
-    
-          alias_method :attribute, :attributes
         end
+  
+        #
+        # Defines a named format with a block
+        #
+        # @param [Symbol] fmt the name of the format you wish to create
+        #
+        #
+        def format(fmt)
+          scoped_formats.push(fmt)
+          yield
+        ensure
+          scoped_formats.pop
+        end
+  
+        alias_method :attribute, :attributes
       end
     end
   end

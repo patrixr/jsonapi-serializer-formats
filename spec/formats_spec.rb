@@ -6,18 +6,25 @@ RSpec.describe JSONAPI::Formats do
   let(:json) { serializer.serializable_hash }
   let(:data) { json[:data] }
 
-  context 'Filtering attributes' do
+  context 'Rendering custom formats' do
     let(:serializer_klass) do
       Class.new do
         include JSONAPI::Serializer
         include JSONAPI::Formats
+
+        def self.name
+          "MovieSerializer"
+        end
     
         set_type :movie
     
         attributes :name
-    
+
         format :detailed do
           attribute :year
+
+          has_many :actors
+          belongs_to :owner, serializer: UserSerializer
 
           format :review do
             attribute :rating_count
@@ -44,6 +51,10 @@ RSpec.describe JSONAPI::Formats do
       it "does not include attributes nested in a format" do
         expect(data[:attributes][:year]).to be_nil
       end
+
+      it "does not include the nested relationships" do
+        expect(data[:relationships]).to eq({})
+      end
     end
 
     context 'with a selected format passed as param' do
@@ -53,8 +64,15 @@ RSpec.describe JSONAPI::Formats do
         expect(data[:attributes][:name]).to eq(movie.name)
       end
   
-      it "does not include attributes nested in the specified format" do
+      it "includes attributes in the specified format" do
         expect(data[:attributes][:year]).to eq(movie.year)
+      end
+
+      it "include the relationships in the specified format" do
+        expect(data[:relationships][:actors]).not_to be_nil
+        expect(data[:relationships][:actors][:data][0][:id]).to eq(movie.actors.first.uid)
+        expect(data[:relationships][:owner]).not_to be_nil
+        expect(data[:relationships][:owner][:data][:id]).to eq(movie.owner.uid)
       end
     end
 
@@ -65,7 +83,7 @@ RSpec.describe JSONAPI::Formats do
         expect(data[:attributes][:name]).to eq(movie.name)
       end
   
-      it "does not include attributes nested in each of the specified formats" do
+      it "includes attributes nested in each of the specified formats" do
         expect(data[:attributes][:year]).to eq(movie.year)
         expect(data[:attributes][:view_count]).to eq(movie.view_count)
       end
