@@ -2,7 +2,9 @@ Gem::Specification.new do |s|
   s.name        = 'jsonapi-serializer-formats'
   s.version     = '0.0.1'
   s.summary     = "Adds support for formats to serializers"
-  s.description = "Adds support for formats to serializers"
+  s.description = <<-EOF
+    A module to enrich JSON:API Serializers (https://github.com/jsonapi-serializer) with configurable formats
+  EOF
   s.authors     = ["Patrick Rabier"]
   s.email       = 'patrick@tronica.io'
   s.files       = Dir['lib/**/*.rb']
@@ -12,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency('jsonapi-serializer', '>= 2.1.0')
   s.add_runtime_dependency('activesupport', '>= 4.2')
-  
+
   s.add_development_dependency('activerecord')
   s.add_development_dependency('bundler')
   s.add_development_dependency('byebug')
