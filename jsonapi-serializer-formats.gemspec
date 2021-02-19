@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'jsonapi-serializer-formats'
-  s.version     = '0.0.3'
+  s.version     = '0.0.4'
   s.summary     = "Adds 'formats' to JSON::API Serializers"
   s.description = <<-EOF
     A module to enrich JSON:API Serializers (https://github.com/jsonapi-serializer) with configurable formats

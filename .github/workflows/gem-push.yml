@@ -16,7 +16,7 @@ jobs:
     - name: Set up Ruby 2.7
       uses: actions/setup-ruby@v1
       with:
-        ruby-version: 2.t.x
+        ruby-version: 2.7.x
     - name: Test
       run: bundle exec rspec
     - name: Publish to RubyGems
