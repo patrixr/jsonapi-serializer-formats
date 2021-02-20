@@ -114,7 +114,7 @@ end
 ```
 
 ```ruby
-hash = MovieSerializer.new(movie, { params: [:detailed, :admin] }).serializable_hash
+hash = MovieSerializer.new(movie, { params: { format: [:detailed, :admin] } }).serializable_hash
 ```
 
 Renders
