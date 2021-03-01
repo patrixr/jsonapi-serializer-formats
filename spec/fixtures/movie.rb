@@ -59,6 +59,7 @@ end
 
 class MovieSerializer
   include JSONAPI::Serializer
+  include JSONAPI::Formats
 
   set_type :movie
 

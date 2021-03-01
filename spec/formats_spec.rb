@@ -37,6 +37,7 @@ RSpec.describe JSONAPI::Formats do
 
         format :report do
           attribute :view_count
+          attribute :rating
         end
       end
     end
@@ -44,11 +45,12 @@ RSpec.describe JSONAPI::Formats do
     context 'with no selected format' do
       let(:selected_formats) { nil }
 
-      it "includes the non-scoped attributes" do
+      it "only includes the non-scoped attributes" do
+        expect(data[:attributes].keys).to eq([:name])
         expect(data[:attributes][:name]).to eq(movie.name)
       end
   
-      it "does not include attributes nested in a format" do
+      it "does not include attributes nested in a format" do  
         expect(data[:attributes][:year]).to be_nil
       end
 
@@ -112,6 +114,21 @@ RSpec.describe JSONAPI::Formats do
         it "does not include the attributes of the nested format" do
           expect(data[:attributes][:rating_count]).to be_nil
         end
+      end
+    end
+
+    context 'with an attribute specified in multiple formats' do
+      it 'renders when either format is selected' do
+        out = serializer_klass.new(movie, { params: { format: [:review] }}).serializable_hash
+        expect(out.dig(:data, :attributes, :rating)).to eq(movie.rating)
+
+        out2 = serializer_klass.new(movie, { params: { format: [:report] }}).serializable_hash
+        expect(out2.dig(:data, :attributes, :rating)).to eq(movie.rating)
+      end
+
+      it 'renders when both formats are selected' do
+        out = serializer_klass.new(movie, { params: { format: [:review, :report] }}).serializable_hash
+        expect(out.dig(:data, :attributes, :rating)).to eq(movie.rating)
       end
     end
   end

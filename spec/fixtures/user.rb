@@ -19,6 +19,7 @@ end
 
 class UserSerializer
   include JSONAPI::Serializer
+  include JSONAPI::Formats
 
   set_id :uid
   attributes :first_name, :last_name, :email

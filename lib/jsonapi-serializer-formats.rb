@@ -6,7 +6,11 @@ module JSONAPI
       class << self 
 
         def scoped_formats
-          @@scoped_formats ||= []
+          @scoped_formats ||= []
+        end
+
+        def formats_per_attr
+          @formats_per_attr ||= {}
         end
   
         # --- Override the attribute and relationship methods to support contexts
@@ -23,23 +27,30 @@ module JSONAPI
           alias_method original_method_name, method_name
 
           define_method(method_name) do |*attributes_list, &block|
-            formats = [*scoped_formats]
-    
-            if formats.length.positive?
-              
-              # --- Read options hash (if present)
 
-              opts = attributes_list.last
-              unless opts.is_a?(Hash)
-                opts = {}
-                attributes_list << opts
-              end
+            # --- If we're not in a format blocked, pass through
+
+            return send(original_method_name, *attributes_list, &block) unless scoped_formats.length.positive?
+              
+            # --- Read options hash (if present)
+
+            opts = attributes_list.last
+            unless opts.is_a?(Hash)
+              opts = {}
+              attributes_list << opts
+            end
+
+            user_condition = opts[:if] || Proc.new { true }
+            
+            attributes_list[0..-2].each do |field|
+
+              (formats_per_attr[field] ||= []) << [*scoped_formats]
               
               # --- Inject an :if condition
 
-              cond = opts[:if]
-              opts[:if] = Proc.new do |_, params = {}|
-                if cond.present? && !cond.call(_, params)
+              field_opts = opts.dup
+              field_opts[:if] = Proc.new do |_, params = {}|
+                if !user_condition.call(_, params)
                   next false # --- The user's condition failed
                 end
 
@@ -47,13 +58,13 @@ module JSONAPI
 
                 # --- Return true if the user passed the require formats as params
 
-                formats.all? { |f| render_formats.include?(f) }
+                formats_per_attr[field].any? do |formats|
+                  formats.all? { |f| render_formats.include?(f) }
+                end
               end
-            end
-    
-            # --- Call the original method
 
-            send(original_method_name, *attributes_list, &block)
+              send(original_method_name, *[field, field_opts], &block)
+            end
           end
         end
   
