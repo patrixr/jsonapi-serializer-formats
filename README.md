@@ -4,9 +4,7 @@ A module to enrich [JSON:API Serializers](https://github.com/jsonapi-serializer)
 
 [![Version](https://img.shields.io/gem/v/jsonapi-serializer-formats)](https://rubygems.org/gems/jsonapi-serializer-formats)
 [![License](https://img.shields.io/github/license/rails/rails)](https://github.com/rails/rails)
-<br>
-[![forthebadge](https://forthebadge.com/images/badges/made-with-ruby.svg)](https://forthebadge.com)
-
+[![RSpec](https://github.com/patrixr/jsonapi-serializer-formats/actions/workflows/rspec.yml/badge.svg)](https://github.com/patrixr/jsonapi-serializer-formats/actions/workflows/rspec.yml)
 ## Installation
 
 Add this line to your Gemfile:
